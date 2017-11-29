@@ -1,0 +1,273 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="iso-8859-9" />
+    <title></title>
+    <style>
+        body {
+            background: url(img/flowers.jpg);
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+
+        #site {
+            width: 600px;
+            height: auto;
+            display: block;
+            position: relative;
+            margin: 0 auto;
+            overflow:auto;
+        }
+            /*Normalde backgroun image için opacity verilemez, bu yöntem ile opacity verdik. */
+            #site::after {
+                content: "";
+                background: url(img/background.jpg);
+                opacity: 0.8;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                position: absolute;
+                z-index: -1;
+            }
+        /*#site {
+            width: 500px;
+            height: auto;
+            margin: 0 auto;
+            border: 2px solid;
+           position:relative;
+            background-size: cover;
+
+        }
+            */
+
+        #banner {
+            border-bottom: 1px solid red;
+            text-align: center;
+            color: darkred;
+        }
+
+        h1, h2, h3 {
+            text-decoration: underline;
+        }
+        #head_content{
+            height:155px;
+            overflow:hidden;
+        } 
+        #p_bilgiler {
+            margin-left: 220px;
+            overflow:hidden;
+        }
+
+            #p_bilgiler table {
+                text-align: left;
+                margin-top: 30px;
+                float: left;
+                
+            }
+
+            #p_bilgiler span {
+                text-decoration: underline;
+                color: #FF5722;
+            }
+
+        #pp {
+            width: 150px;
+            height: 150px;
+            background: black;
+            /*display:inline-block;*/
+            float: left;
+            margin-left: 20px;
+            margin-right: 20px;
+            overflow: auto;
+            border-radius: 50%;           
+            z-index:10;
+            position:relative;
+            
+        }
+
+            #pp:hover , #konuBaslik:hover, #ozgecmisBaslik:hover, #name:hover{
+                cursor: pointer;
+            }
+        .ppHigh {
+            width: 350px !important;
+            height: 350px !important;
+            background:url(img/flowers.jpg)
+           
+        }
+        
+        #content {
+            clear: both;
+            color: #FF5722;
+            overflow: auto;
+            margin: 10px;
+            padding: 10px;
+        }
+
+        #head_content {
+            margin-top: 10px;
+        }
+
+       
+
+        #ozgecmis {
+            color: #684146;
+            font-weight: bold;
+        }
+        #footer {
+            color: #FF5722;
+            margin: 10px;
+            padding: 10px;
+        }
+        #footer ol li {
+            display: inline-block;
+            margin: 10px;
+            text-decoration: underline;
+            list-style-type:none;
+            color: rgb(104, 65, 70);
+            font-weight:bolder;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="site">
+
+        <div id="banner">
+            <h1 id="name">İsim Soyisim</h1>
+        </div>
+        <div id="contanier">
+            <div id="header">
+                <div id="head_content">
+
+                    <img id="pp" src="" alt="Profil Resmi" onclick="" />
+                    <div id="p_bilgiler">
+                        <table>
+                            <tr>
+                                <th>Doğum Tarihi :</th>
+                                <th><span id="dogumTarihi">DogumTarihi</span></th>
+                            </tr>
+                            <tr>
+                                <th>Okulu :</th>
+                                <th><span id="okul"> Okulu</span></th>
+                            </tr>
+                            <tr>
+                                <th>Fakültesi:</th>
+                                <th><span id="fakulte"> Fakültesi</span></th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content">
+                <h2 id="ozgecmisBaslik">ÖZGEÇMİŞ</h2>
+                <p id="ozgecmis"> Özgeçmiş Metni </p>
+            </div>
+            <div id="footer">
+                <h2 id="konuBaslik">Konular</h2>
+                <ol id="konular"></ol>
+            </div>
+        </div>
+    </div>
+    <script src="content/jquery-3.2.1.min.js"></script>
+    <script src="content/jquery.cookie.js"></script>
+    <script src="content/kullanicilar.js"></script>
+    <script>
+        if ($.cookie("index")) {
+            $.ajax({
+                url: 'content/kullanicilar.js',
+                method: 'get',
+                success: function (data) {
+                    var kullanicilar = JSON.parse(data);
+                    var kullaniciId = $.cookie('index');
+                    for (var i = 0; i < kullanicilar.length; i++) {
+                        if (kullanicilar[i].id == kullaniciId) {
+                            var kullanici = kullanicilar[i]
+                            $('#name').text(kullanici.isim + ' ' + kullanici.soyisim + '(' + kullanici.kullanici_adi + ')');
+
+                            var pp = kullanici.profil_resmi;
+                            $('#pp').attr('src', pp);
+
+                            var dogumTarihi = kullanici.d_tarihi
+                            var okulu = kullanici.mezun_oldgu_okul
+                            var fakulte = kullanici.fakulte;
+                            $('#dogumTarihi').text(dogumTarihi);
+                            $('#okul').text(okulu);
+                            $('#fakulte').text(fakulte);
+
+                            var ozgecmis = kullanici.ozgecmis;
+                            $('#ozgecmis').text(ozgecmis);
+
+                            var konular = kullanici.konular;
+                            $.each(konular, function (j) {
+                                var li = $('<li>'+'*'+ konular[j] + '<li>');
+                                $('#konular').append(li);
+                            })
+
+                            break;
+                        }
+
+                    }
+                }
+            })
+            $('#konuBaslik').on('click', function () {
+                $('#konular').slideToggle(1000)
+            })
+            $('#ozgecmisBaslik').on('click', function () {
+                $('#ozgecmis').slideToggle(1000)
+            })
+            $('#name').on('click', function () {
+                var div = $('#contanier')
+                div.slideToggle(1000);
+            })
+           
+            
+            //$('#pp').on('click', function () {
+            //    if (ppDurum == true) {
+            //        $('#pp').addClass("ppHigh");
+            //        ppDurum = false;
+            //    } else {
+            //        $('#pp').removeClass("ppHigh");
+            //        ppDurum = true;
+            //    }
+            //})
+            var ppDurum = true;
+            $("#pp").click(function () {
+                var div = $("#pp");
+                if (ppDurum == true) {
+                    div.attr('style', 'position:absolute');
+                    div.animate({
+                        height: '300px',
+                        width:'300px',                        
+                        left: '130px'
+                    }, "slow");
+                    ppDurum = false;
+                } else {
+                   
+
+                    div.animate({
+                        height: '150px',
+                        width:'150px',                       
+                        left: '0px'
+                    }, "slow", function () {
+                        div.attr('style', 'position:relative');
+                    });                   
+
+                    ppDurum = true;
+                }
+               
+            });
+
+        } else {
+
+            window.location.href = "login.html"
+        }
+
+
+    </script>
+
+</body>
+</html>

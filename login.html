@@ -1,0 +1,139 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Login</title>
+    <style>
+        body {
+            /*background-color: #3b5998;*/
+            background: url(img/into_the_mist.jpg);
+            background-repeat: repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        #contain {
+            border: 3px solid #f1f1f1;
+            width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255,255,255, 0.2);
+            margin-top: 240px;
+            box-shadow: 0px 0px 23px 6px white
+        }
+
+        #isim, #sifre {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        .uyari{
+            color:firebrick;
+            font-weight:bold;
+
+        }
+        button {
+            background-color: #4267b2;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: 1px solid #29487d;
+            cursor: pointer;
+            width: 100%;
+        }
+
+            button:hover {
+                background-color: #3b5998;
+            }
+    </style>
+</head>
+<body>
+    <div id="contain">
+        <label for="isim"><b>İsim</b></label>
+        <input type="text" name="isim" placeholder="İsminizi Giriniz" id="isim" />
+        <label for="sifre"><b>Şifre</b></label>
+        <input type="password" name="sifre" placeholder="Şifrenizi Giriniz" id="sifre" />
+        <button id="giris"><b>Giris</b></button>
+        <span class="uyari"></span>
+    </div>
+
+
+    <script src="content/jquery-3.2.1.min.js"></script>
+    <script src="content/jquery.cookie.js"></script>
+    <script src="content/kullanicilar.js"></script>
+
+    <script>
+
+
+
+        var sayac = 0;
+        $('#giris').bind('click', function () {
+
+
+
+            var k_Adi = $('#isim').val();
+            var k_Sifre = $('#sifre').val();
+
+            if (k_Adi.trim() == "" || k_Sifre.trim() == "") {
+                $('.uyari').text('Kullanıcı Adı ve Şifre boş bırakılamaz.')
+                return;
+            }
+
+
+            if ($.cookie("sayac") == 4) {
+                $('.uyari').text('Çok fazla hatalı giriş yaptınız. Lütfen 5 dakika sonra tekrar deneyiniz');
+                return;
+            }
+            // function hatalıGirisZamanı(min) {
+            //     var date = new Date();
+            //     date.setTime(date.getTime() + (min * 60 * 1000));
+            //     $.cookie("sayac", sayac, { expires: date });
+            // }
+            //hatalıGirisZamanı(5)
+
+            function cookieGuneCevirme(dakika) {
+                return ((1 / 24) * dakika) / 60;
+            }
+            $.cookie("sayac", sayac, { expires: cookieGuneCevirme(5) });
+
+
+            $.ajax({
+                url: 'content/kullanicilar.js',
+                method: 'get',
+                success: function (data) {
+                    var kullanicilar = JSON.parse(data);
+                    for (var i = 0; i < kullanicilar.length; i++) {
+                        var kullanici = kullanicilar[i];
+                        if (k_Adi == kullanici.kullanici_adi && k_Sifre == kullanici.sifre) {
+                            $.cookie("sayac") == 0;
+                            sayac = 0;
+                            var el = kullanici.id;
+                            $.cookie("index", el);
+                            window.location.href = "Profil.html";
+                            return;
+                        }
+                        ;
+                    }
+                   
+                    if (sayac<4) {
+                        sayac++
+                        $('.uyari').text(sayac + ' defa yanlış girdiniz.' + (5 - sayac) + ' hakkınız kaldı.')
+                    } else {
+                        $('.uyari').text('Çok fazla hatalı giriş yaptınız. Lütfen 5 dakika sonra tekrar deneyiniz')
+                    }
+
+                   
+                }
+            })
+           
+        })
+
+    </script>
+
+
+</body>
+</html>
